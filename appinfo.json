@@ -1,0 +1,22 @@
+{
+    "appKeys": {
+        "message": 1,
+        "status": 0
+    },
+    "capabilities": [
+        ""
+    ],
+    "companyName": "hello@ethanl.ee",
+    "longName": "pebble-blockchain",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "3",
+    "shortName": "pebble-blockchain",
+    "uuid": "535802c9-8edd-4727-a983-84a497e7c9c3",
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": false
+    }
+}

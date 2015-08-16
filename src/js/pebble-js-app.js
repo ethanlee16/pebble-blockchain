@@ -18,7 +18,16 @@
 //   		}
 // 	);
 // }
-var walletArray = [];
+var walletArray = [{
+  "address": "135wpKyGZxqQEZkPLSWcegsZivQ2ALQMMT",
+  "pass": "",
+  "balance": ""
+}, {
+  "address": "1CDdvKuzc1Zy8yCrvwPwuxyP54Y2xpDSgC",
+  "pass": "",
+  "balance": ""
+}];
+
 function generatePassword() {
     var length = 10,
         charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
@@ -43,7 +52,7 @@ function createWallet() {
   	xhr.send();
 	};
 
-	url = 'https://blockchain.info/api/v2/create_wallet&password='+ pass+'&api_code='+apikey;
+	url = 'https://blockchain.info/api/v2/create_wallet?password='+ pass+'&api_code='+apikey;
 
 
   	xhrRequest(url, 'GET', 
@@ -52,14 +61,14 @@ function createWallet() {
       var json = JSON.parse(responseText);
       	address=json.address;
 
-      	Parse.sendAppMessage({
+      	Pebble.sendAppMessage({
       		'ADDRESS':address
       	})
 
       }      
   	);
 
-  	var newWallet;
+  	var newWallet = {};
   	newWallet.address = address;
   	newWallet.pass = pass
   	walletArray.push(newWallet);
@@ -113,11 +122,34 @@ function getStats() {
 }
 
 function viewWallets() {
-	if(walletArray) {
-		Pebble.sendAppMessage({
-			'walletArray': walletArray
-		})
-	}
+  var xhrRequest = function (url, type, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      callback(this.responseText);
+    };
+    xhr.open(type, url);
+    xhr.send();
+  };
+
+  var entries = "";
+  for(var i = 0; i < walletArray.length; i++) {
+    (function() {
+      console.log(i);
+        xhrRequest("http://blockchain.info/address/" 
+        + walletArray[i].address + "?format=json", 'GET', function(resp) {
+
+            walletArray[i].balance = "$" + resp.final_balance / 100000000;
+            entries += walletArray[i].toString() + ",";
+        });
+        console.log(JSON.stringify(walletArray[i]));
+    })(i, walletArray);
+    
+  }
+
+  console.log("Trying: " + entries);
+  Pebble.sendAppMessage({
+    'WALLETARRAY': "[" + entries.substring(0, entries.length - 1) + "]"
+  });
 }
 
 
@@ -129,8 +161,8 @@ function callData(param) {
 		case 'createWallet':
 			createWallet();
 			break;
-		case 'viewWallet':
-			viewWallet();
+		case 'viewWallets':
+			viewWallets();
 			break;
 	}
 
@@ -139,6 +171,13 @@ function callData(param) {
 // Called when JS is ready + kushnote: do we have to call this if we're doing callData() anyway
 Pebble.addEventListener("ready",function(e) {
 	//getStats();
+  console.log("ready");
+  /*
+  Pebble.sendAppMessage({
+    'WALLETARRAY': walletArray
+  })
+*/
+
 });
 												
 // Called when incoming message from the Pebble is received

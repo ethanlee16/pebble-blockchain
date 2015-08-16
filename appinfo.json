@@ -1,5 +1,11 @@
 {
     "appKeys": {
+        "WALLETARRAY": 10,
+        "ADDRESS": 9,
+        "MINERREVENUE": 8,
+        "BLOCKSIZE": 7,
+        "BLOCKSTOTAL": 6,
+        "BLOCKSMINED": 5,
         "SELLPRICE": 4,
         "BUYPRICE": 3,
         "REQ": 2,

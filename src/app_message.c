@@ -57,10 +57,24 @@ static void sync_error_cb(DictionaryResult dict_error, AppMessageResult app_mess
 static void sync_tuple_changed_cb(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
     switch(key) {
     case BUYPRICE:
-        text_layer_set_text(s_buy_text, new_tuple->value->cstring);
+    ;
+        const char* bprice = new_tuple->value->cstring;
+        const char* buy = "Buy Price: $";
+        char* bmsg;
+        bmsg = malloc(strlen(bprice) + strlen(buy));
+        strcpy(bmsg, buy);
+        strcat(bmsg, bprice);
+        text_layer_set_text(s_buy_text, bmsg);
         break;
     case SELLPRICE:
-        text_layer_set_text(s_sell_text, new_tuple->value->cstring);
+    ;
+        const char* sprice = new_tuple->value->cstring;
+        const char* sell = "Sell Price: $";
+        char* smsg;
+        smsg = malloc(strlen(sprice) + strlen(sell));
+        strcpy(smsg, sell);
+        strcat(smsg, sprice);
+        text_layer_set_text(s_sell_text, smsg);
         break;
     }
 }

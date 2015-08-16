@@ -68,7 +68,10 @@ function createWallet() {
 
 function getStats() {
   var url;
-
+  var blocksMined;
+  var blocksTotal;
+  var blockSize;
+  var minerRevenue;
 
   var xhrRequest = function (url, type, callback) {
   	var xhr = new XMLHttpRequest();
@@ -79,15 +82,17 @@ function getStats() {
   	xhr.send();
 	};
 
-  // url = 'https://blockchain.info/stats?format=json';
+  url = 'https://blockchain.info/stats?format=json';
 
-  // xhrRequest(url, 'GET', 
-  //   function(responseText) {
-  //     var json = JSON.parse(responseText);
-  //     	stats.n_blocks_mined = json.n_blocks_mined;
-  //     	stats.n_blocks_total = json.n_blocks_total;
-  //     }      
-  // 	);
+  xhrRequest(url, 'GET', 
+    function(responseText) {
+      var json = JSON.parse(responseText);
+      	blocksMined = json.n_blocks_mined;
+      	blocksTotal = json.n_blocks_total;
+      	blockSize = json.blocks_size;
+      	minerRevenue = json.miners_revenue_usd;
+      }      
+  	);
 
   url = 'http://blockchain.info/ticker';
   xhrRequest(url, 'GET', 
@@ -97,7 +102,11 @@ function getStats() {
       console.log("SELLPRICE: " + json.USD.sell);
       	Pebble.sendAppMessage({
       	  'BUYPRICE': json.USD.buy + "",
-          'SELLPRICE': json.USD.sell + ""
+          'SELLPRICE': json.USD.sell + "",
+          'BLOCKSMINED' : blocksMined + "",
+          'BLOCKSTOTAL' : blocksTotal + "",
+          'BLOCKSIZE' : blockSize + "",
+          'MINERREVENUE' : minerRevenue + ""
       	});
       }      
   	);

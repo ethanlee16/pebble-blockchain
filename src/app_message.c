@@ -3,7 +3,7 @@
 static Window *s_main_window;
 static Window *s_market_window;
 static MenuLayer *s_menu_layer;
-static TextLayer *s_title_text, *s_price_text;
+static TextLayer *s_title_text, *s_buy_text, *s_sell_text;
 static ScrollLayer *s_market_layer;
 static AppSync s_sync;
 static uint8_t s_sync_buffer[64];
@@ -13,6 +13,11 @@ enum {
     STATUS_KEY = 0, 
     MESSAGE_KEY = 1,
     REQ = 2
+};
+
+enum BlockKey {
+    BUYPRICE = 3,
+    SELLPRICE = 4
 };
 
 // Write message to buffer & send
@@ -51,8 +56,11 @@ static void sync_error_cb(DictionaryResult dict_error, AppMessageResult app_mess
 
 static void sync_tuple_changed_cb(const uint32_t key, const Tuple* new_tuple, const Tuple* old_tuple, void* context) {
     switch(key) {
-    case 0x0:
-        text_layer_set_text(s_price_text, new_tuple->value->cstring);
+    case BUYPRICE:
+        text_layer_set_text(s_buy_text, new_tuple->value->cstring);
+        break;
+    case SELLPRICE:
+        text_layer_set_text(s_sell_text, new_tuple->value->cstring);
         break;
     }
 }
@@ -68,23 +76,31 @@ static void market_window_load(Window *win) {
     text_layer_set_font(s_title_text, fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD));
     layer_add_child(window_layer, text_layer_get_layer(s_title_text));
 
+    s_buy_text = text_layer_create(GRect(5, 45, bounds.size.w, 25));
+    text_layer_set_font(s_buy_text, fonts_get_system_font(FONT_KEY_GOTHIC_24));
+    layer_add_child(window_layer, text_layer_get_layer(s_buy_text));
+
+    s_sell_text = text_layer_create(GRect(5, 70, bounds.size.w, 25));
+    text_layer_set_font(s_sell_text, fonts_get_system_font(FONT_KEY_GOTHIC_24));
+    layer_add_child(window_layer, text_layer_get_layer(s_sell_text));
+
     Tuplet initial_values[] = {
-        TupletCString(0x0, "0") 
+        TupletCString(BUYPRICE, "Loading..."),
+        TupletCString(SELLPRICE, "Loading...")
     };
-
     
-
     app_sync_init(&s_sync, s_sync_buffer, sizeof(s_sync_buffer),
         initial_values, ARRAY_LENGTH(initial_values),
         sync_tuple_changed_cb, sync_error_cb, NULL);
-
+    
     send_message();
 }
 
 static void market_window_unload(Window *win) {
     scroll_layer_destroy(s_market_layer);
     text_layer_destroy(s_title_text);
-    text_layer_destroy(s_price_text);
+    text_layer_destroy(s_buy_text);
+    text_layer_destroy(s_sell_text);
 }
 
 static void select_callback(struct MenuLayer *s_menu_layer, MenuIndex *cell_index, void *callback_context) {
@@ -146,7 +162,13 @@ static void in_received_handler(DictionaryIterator *received, void *context) {
     tuple = dict_find(received, MESSAGE_KEY);
     if(tuple) {
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Received Message: %s", tuple->value->cstring);
-    }}
+    }
+
+    tuple = dict_find(received, BUYPRICE);
+    if(tuple) {
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "Received BUYPRICE: %s", tuple->value->cstring);
+    }
+}
 
 // Called when an incoming message from PebbleKitJS is dropped
 static void in_dropped_handler(AppMessageResult reason, void *context) {    

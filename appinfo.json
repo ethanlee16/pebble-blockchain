@@ -1,5 +1,8 @@
 {
     "appKeys": {
+        "SELLPRICE": 4,
+        "BUYPRICE": 3,
+        "REQ": 2,
         "message": 1,
         "status": 0
     },

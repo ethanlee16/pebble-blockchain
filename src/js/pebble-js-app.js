@@ -32,8 +32,7 @@ function generatePassword() {
 function createWallet() {
 	var address;
 	var pass = generatePassword();
-	var apikey = /** insert API key here */
-
+	var apikey = "e41ca89f-e3d4-483e-8c45-a27374631872";
 
 	var xhrRequest = function (url, type, callback) {
   	var xhr = new XMLHttpRequest();
@@ -94,11 +93,11 @@ function getStats() {
   xhrRequest(url, 'GET', 
     function(responseText) {
       var json = JSON.parse(responseText);
-      	stats.buyprice = json.USD.buy;
-      	stats.sellprice = json.USD.sell;
+      console.log("BUYPRICE: " + json.USD.buy);
+      console.log("SELLPRICE: " + json.USD.sell);
       	Pebble.sendAppMessage({
-      	  'BUYPRICE': stats.buyprice,
-          'SELLPRICE': stats.sellprice
+      	  'BUYPRICE': json.USD.buy + "",
+          'SELLPRICE': json.USD.sell + ""
       	});
       }      
   	);
@@ -130,12 +129,13 @@ function callData(param) {
 
 // Called when JS is ready + kushnote: do we have to call this if we're doing callData() anyway
 Pebble.addEventListener("ready",function(e) {
-	getStats();
+	//getStats();
 });
 												
 // Called when incoming message from the Pebble is received
 Pebble.addEventListener("appmessage",function(e) {
 	console.log("Received Status: " + e.payload.status);
-	callData(e.payload.req);
+  console.log("Received type of req: " + e.payload.REQ);
+	callData(e.payload.REQ);
 	//sendMessage();
 });

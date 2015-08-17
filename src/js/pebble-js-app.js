@@ -68,9 +68,11 @@ function createWallet() {
       }      
   	);
 
-  	var newWallet = {};
-  	newWallet.address = address;
-  	newWallet.pass = pass
+  	var newWallet = {
+      address: address,
+      pass: pass
+    };
+
   	walletArray.push(newWallet);
   	console.log(walletArray.length + 'hi im the wallets current length');
 }
@@ -135,11 +137,10 @@ function viewWallets() {
   for(var i = 0; i < walletArray.length; i++) {
     (function() {
       console.log(i);
+      var final_bal;
         xhrRequest("http://blockchain.info/address/" 
-        + walletArray[i].address + "?format=json", 'GET', function(resp) {
-
-            walletArray[i].balance = "$" + resp.final_balance / 100000000;
-            entries += walletArray[i].toString() + ",";
+        + walletArray[i].address + "?format=json", 'GET', function(resp) {         
+            final_bal = "$" + resp.final_balance / 100000000;
         });
         console.log(JSON.stringify(walletArray[i]));
     })(i, walletArray);
